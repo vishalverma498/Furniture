@@ -1,4 +1,3 @@
-// DrawerThumbnailList.js
 import React from "react";
 
 export default function DrawerThumbnailList({ images, selected, onSelect }) {
@@ -8,14 +7,16 @@ export default function DrawerThumbnailList({ images, selected, onSelect }) {
         <button
           key={img}
           onClick={() => onSelect(idx)}
-          className={`w-full max-w-[180px] sm:w-44 sm:h-44 aspect-square rounded-2xl overflow-hidden shadow-lg border-4 ${
-            selected === idx ? "border-[#F4C16B]" : "border-transparent"
-          }`}
+          type="button"
+          className={`w-full sm:w-44 sm:h-44 aspect-square rounded-2xl overflow-hidden bg-transparent p-0 m-0 border border-transparent`}
+          style={selected === idx ? { outline: "4px solid #F4C16B" } : { boxShadow: "none" }}
         >
           <img
             src={img}
             alt={`Drawer ${idx + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover block"
+            style={{ imageRendering: "crisp-edges" }}
+            draggable={false}
           />
         </button>
       ))}

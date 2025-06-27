@@ -22,8 +22,8 @@ const chairImages = [
 const colorVariants = [
   "/images/ChestofDrawers/001.1.jpg",
   "/images/ChestofDrawers/001.2.jpg",
-  "/images/ChestofDrawers/001.3.jpg",
   "/images/ChestofDrawers/001.4.jpg",
+  "/images/ChestofDrawers/001.3.jpg",
   "/images/ChestofDrawers/001.5.jpg",
 ];
 
@@ -37,7 +37,7 @@ export default function ChestofDrawers() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col bg-white overflow-hidden">
+    <div className="w-screen min-h-screen flex flex-col bg-white overflow-hidden">
       {/* Header */}
       <div className="bg-[#252223] px-6 sm:px-10 py-4 flex flex-col lg:flex-row items-start lg:items-center justify-between shrink-0">
         <img
@@ -52,16 +52,20 @@ export default function ChestofDrawers() {
         </div>
       </div>
 
+      {/* Back button for mobile (above the content) */}
+      <div className="px-4 sm:px-10 py-4 block lg:hidden">
+        <button
+          onClick={handleBack}
+          className="bg-[#F4C16B] text-white px-6 py-2 rounded-full text-lg font-semibold shadow hover:bg-[#e0a94b] transition"
+        >
+          Back
+        </button>
+      </div>
+
       {/* Main Content */}
-      <div className="flex flex-1 min-h-0 overflow-hidden px-4 sm:px-10 py-6 gap-6">
-        <div className="w-full lg:w-1/3 overflow-y-auto">
-          <DrawerThumbnailList
-            images={chairImages}
-            selected={selected}
-            onSelect={setSelected}
-          />
-        </div>
-        <div className="w-full lg:w-2/3 overflow-y-auto">
+      <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden px-4 sm:px-10 py-6 gap-6">
+        {/* DrawerPreview on top on small screens, on right on large */}
+        <div className="w-full lg:w-2/3 overflow-y-auto order-1 lg:order-2 flex flex-col flex-grow">
           <DrawerPreview
             mainImage={chairImages[selected]}
             colorVariants={colorVariants}
@@ -69,10 +73,19 @@ export default function ChestofDrawers() {
             onColorSelect={setColor}
           />
         </div>
+
+        {/* Thumbnails below on small screens, left on large */}
+        <div className="w-full lg:w-1/3 overflow-y-auto order-2 lg:order-1">
+          <DrawerThumbnailList
+            images={chairImages}
+            selected={selected}
+            onSelect={setSelected}
+          />
+        </div>
       </div>
 
-      {/* Back Button */}
-      <div className="absolute bottom-6 right-6 z-50">
+      {/* Back button for desktop (bottom right fixed) */}
+      <div className="hidden lg:block absolute bottom-6 right-6 z-50">
         <button
           onClick={handleBack}
           className="bg-[#F4C16B] text-white px-6 py-2 rounded-full text-lg font-semibold shadow hover:bg-[#e0a94b] transition"

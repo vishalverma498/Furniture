@@ -24,7 +24,7 @@ export default function ShowMore() {
   return (
     <div className="min-h-screen w-screen bg-white flex flex-col">
       {/* Header */}
-      <div className="bg-[#252223] flex flex-col lg:flex-row items-start lg:items-center justify-between px-6 sm:px-10 py-6">
+      <div className="bg-[#252223] flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 sm:px-6 py-6">
         <div className="flex items-center space-x-4 mb-4 lg:mb-0">
           <img
             src="/images/home/ylogo.png"
@@ -42,8 +42,8 @@ export default function ShowMore() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col justify-between">
         {/* Grid */}
-        <div className="max-w-7xl mx-auto py-10 px-4 flex-1">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-8 gap-y-12">
+        <div className="w-full px-2 sm:px-4 py-10 flex-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
             {paginated.map((cat) => (
               <div key={cat.label} className="flex flex-col items-center">
                 <Link to={`/${cat.route}`}>
@@ -62,7 +62,16 @@ export default function ShowMore() {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center sm:justify-end items-center px-4 sm:px-16 pb-8 space-x-2">
+        <div className="flex justify-center sm:justify-end items-center px-4 sm:px-6 pb-8 space-x-2">
+          {/* Back Button */}
+          <Link
+            to="/"
+            className="mr-2 px-3 py-1 rounded bg-gray-300 text-black text-sm font-semibold"
+          >
+            BACK
+          </Link>
+
+          {/* Page Numbers */}
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
@@ -74,6 +83,8 @@ export default function ShowMore() {
               {i + 1}
             </button>
           ))}
+
+          {/* Next Button */}
           {page < totalPages && (
             <button
               onClick={() => setPage(page + 1)}
