@@ -20,11 +20,11 @@ const chairImages = [
 ];
 
 const colorVariants = [
-  "/images/ChestofDrawers/001.1.jpg",
-  "/images/ChestofDrawers/001.2.jpg",
-  "/images/ChestofDrawers/001.4.jpg",
-  "/images/ChestofDrawers/001.3.jpg",
-  "/images/ChestofDrawers/001.5.jpg",
+  "/images/ChestofDrawers/option1.jpeg",
+  "/images/ChestofDrawers/option2.jpeg",
+  "/images/ChestofDrawers/option3.jpeg",
+  "/images/ChestofDrawers/option4.jpeg",
+  "/images/ChestofDrawers/option5.jpeg",
 ];
 
 export default function ChestofDrawers() {
@@ -63,9 +63,9 @@ export default function ChestofDrawers() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden px-4 sm:px-10 py-6 gap-6">
-        {/* DrawerPreview on top on small screens, on right on large */}
-        <div className="w-full lg:w-2/3 overflow-y-auto order-1 lg:order-2 flex flex-col flex-grow">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden px-4 sm:px-10 py-6 gap-6">
+        {/* DrawerPreview (fixed height and sticky on large screens) */}
+        <div className="w-full lg:w-2/3 order-1 lg:order-2 lg:h-[calc(100vh-150px)] lg:sticky lg:top-[120px]">
           <DrawerPreview
             mainImage={chairImages[selected]}
             colorVariants={colorVariants}
@@ -74,8 +74,8 @@ export default function ChestofDrawers() {
           />
         </div>
 
-        {/* Thumbnails below on small screens, left on large */}
-        <div className="w-full lg:w-1/3 overflow-y-auto order-2 lg:order-1">
+        {/* Thumbnails scrollable on large screens */}
+        <div className="w-full lg:w-1/3 order-2 lg:order-1 overflow-y-auto lg:max-h-[calc(100vh-150px)] pr-1">
           <DrawerThumbnailList
             images={chairImages}
             selected={selected}

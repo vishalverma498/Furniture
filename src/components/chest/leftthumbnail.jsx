@@ -8,7 +8,7 @@ export default function DrawerThumbnailList({ images, selected, onSelect }) {
           key={img}
           onClick={() => onSelect(idx)}
           type="button"
-          className={`w-full sm:w-44 sm:h-44 aspect-square rounded-2xl overflow-hidden bg-transparent p-0 m-0 border border-transparent`}
+          className={`w-full sm:w-44 sm:h-44 aspect-square rounded-2xl overflow-hidden bg-transparent p-0 m-1 border border-transparent`}
           style={selected === idx ? { outline: "4px solid #F4C16B" } : { boxShadow: "none" }}
         >
           <img

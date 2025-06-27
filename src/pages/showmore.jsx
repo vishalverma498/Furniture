@@ -11,10 +11,10 @@ const categories = [
   { label: "Crockery Units", img: "/images/CrockeryUnits/001.jpg", route: "crockery" },
   { label: "Sofas", img: "/images/sofa/sofa.jpg", route: "sofa" },
   { label: "Bedside Tables", img: "/images/BedsideTables/001.jpg", route: "beside" },
-  { label: "Dinning Table Sets", img: "/images/dinningtable/dinning.jpeg", route: "dinningtable" },
+  { label: "Dinning Table Sets", img: "/images/dinningtable/dinning.jpeg", route: "bedside" },
 ];
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 10;
 
 export default function ShowMore() {
   const [page, setPage] = React.useState(1);
