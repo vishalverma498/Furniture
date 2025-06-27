@@ -64,8 +64,8 @@ export default function HomePage() {
           className="flex w-10 h-10 md:w-12 md:h-12 items-center justify-center rounded-full bg-white/30 hover:bg-white/50 transition"
         >
           <svg width="28" height="28" fill="none">
-            <circle cx="14" cy="14" r="13" stroke="white" strokeWidth="2" />
-            <polyline points="16,8 10,14 16,20" stroke="white" strokeWidth="2" fill="none" />
+            {/*<circle cx="14" cy="14" r="13" stroke="white" strokeWidth="2" />*/}
+            <polyline points="11,8 5,14 11,20" stroke="white" strokeWidth="2" fill="none" />
           </svg>
         </button>
 
@@ -96,8 +96,8 @@ export default function HomePage() {
           className="flex w-10 h-10 md:w-12 md:h-12 items-center justify-center rounded-full bg-white/30 hover:bg-white/50 transition"
         >
           <svg width="28" height="28" fill="none">
-            <circle cx="14" cy="14" r="13" stroke="white" strokeWidth="2" />
-            <polyline points="12,8 18,14 12,20" stroke="white" strokeWidth="2" fill="none" />
+            {/*<circle cx="14" cy="14" r="13" stroke="white" strokeWidth="2" />*/}
+            <polyline points="6,8 12,14 6,20" stroke="white" strokeWidth="2" fill="none" />
           </svg>
         </button>
       </div>
@@ -105,14 +105,8 @@ export default function HomePage() {
       {/* Tailwind animation styles */}
       <style>{`
        
-        @keyframes slideInLeft {
-          from { transform: translateX(120%) scale(0.9); opacity: 0.6; }
-          to { transform: translateX(0) scale(0.9); opacity: 0.6; }
-        }
-        @keyframes slideOutLeft {
-          from { transform: translateX(0) scale(0.9); opacity: 0.6; }
-          to { transform: translateX(-120%) scale(0.9); opacity: 0.6; }
-        }
+    
+        
 
         .animate-slideInLeft { animation: slideInLeft 0.5s ease; }
         .animate-slideOutLeft { animation: slideOutLeft 0.5s ease; }
