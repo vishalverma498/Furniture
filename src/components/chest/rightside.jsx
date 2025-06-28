@@ -48,7 +48,7 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
   return (
     <div className="flex-1 flex flex-col items-center">
       {/* 3D Model Viewer */}
-      <div className="w-full max-w-[600px] h-[350px] sm:h-[450px] bg-black rounded-lg overflow-hidden shadow-xl">
+      <div className="w-full max-w-[600px] h-[350px] sm:h-[450px] bg-white rounded-lg overflow-hidden shadow-xl">
         <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
           {/* Adjust light intensities as needed */}
           <ambientLight intensity={0.5} />

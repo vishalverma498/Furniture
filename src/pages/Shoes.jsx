@@ -87,7 +87,7 @@ export default function ShoesRack() {
 
           {/* Right: Main Chair + Variants */}
           <div className="flex-1 flex flex-col items-center">
-            <div className="w-full max-w-[600px] h-[250px] sm:h-[400px] bg-black rounded-lg flex items-center justify-center shadow-xl">
+            <div className="w-full max-w-[600px] h-[250px] sm:h-[400px] bg-white rounded-lg flex items-center justify-center shadow-xl">
               <img
                 src={colorVariants[color] || chairImages[selected]}
                 alt="Selected chair"
