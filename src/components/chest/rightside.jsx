@@ -6,6 +6,7 @@ import {
   Html,
   Environment,
   Line,
+  ContactShadows,
 } from "@react-three/drei";
 import { EXRLoader } from "three-stdlib";
 import * as THREE from "three";
@@ -18,7 +19,7 @@ import {
   Info,
 } from "lucide-react";
 
-// Load .exr lighting
+// Load .exr skydome lighting (skylight only, no background)
 function EXREnvironment({ path }) {
   const texture = useLoader(EXRLoader, path);
   texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -69,7 +70,16 @@ function DimensionBox({ box }) {
 
       <Html
         position={[(min.x + max.x) / 2, min.y, min.z - 0.05]}
-        style={labelStyle}
+        style={{
+          color: "black",
+          backgroundColor: "rgba(255,255,255,0.8)",
+          padding: "2px 6px",
+          borderRadius: "4px",
+          fontSize: "12px",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
         center
       >
         Width: {width} m
@@ -77,7 +87,16 @@ function DimensionBox({ box }) {
 
       <Html
         position={[min.x - 0.05, (min.y + max.y) / 2, min.z]}
-        style={labelStyle}
+        style={{
+          color: "black",
+          backgroundColor: "rgba(255,255,255,0.8)",
+          padding: "2px 6px",
+          borderRadius: "4px",
+          fontSize: "12px",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
         center
       >
         Height: {height} m
@@ -85,7 +104,16 @@ function DimensionBox({ box }) {
 
       <Html
         position={[max.x + 0.05, min.y, (min.z + max.z) / 2]}
-        style={labelStyle}
+        style={{
+          color: "black",
+          backgroundColor: "rgba(255,255,255,0.8)",
+          padding: "2px 6px",
+          borderRadius: "4px",
+          fontSize: "12px",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
         center
       >
         Depth: {depth} m
@@ -94,18 +122,7 @@ function DimensionBox({ box }) {
   );
 }
 
-const labelStyle = {
-  color: "black",
-  backgroundColor: "rgba(255,255,255,0.8)",
-  padding: "2px 6px",
-  borderRadius: "4px",
-  fontSize: "12px",
-  whiteSpace: "nowrap",
-  pointerEvents: "none",
-  userSelect: "none",
-};
-
-// 3D model
+// 3D Model Loader
 function Model({ url, scale = 1.5, visible = true, onLoad }) {
   const gltf = useGLTF(url);
 
@@ -147,12 +164,10 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
   const [box, setBox] = useState(null);
   const [showDimensions, setShowDimensions] = useState(false);
 
-  const shadowPlaneColor = bgWhite ? "#f0f0f0" : "#0a0a0a";
-
   return (
     <div className="flex-1 flex flex-col items-center">
       <div
-        className={`relative w-full max-w-[600px] h-[350px] sm:h-[450px] ${
+        className={`relative w-full max-w-[900px] h-[450px] sm:h-[450px] ${
           bgWhite ? "bg-white" : "bg-black"
         } rounded-lg overflow-hidden shadow-xl`}
       >
@@ -177,18 +192,16 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
           />
 
           {showShadow && (
-            <mesh
-              rotation={[-Math.PI / 2, 0, 0]}
-              position={[0, -0.5, 0]}
-              receiveShadow
-            >
-              <planeGeometry args={[100, 100]} />
-              <meshStandardMaterial
-                color={shadowPlaneColor}
-                opacity={0.9}
-                transparent
-              />
-            </mesh>
+            <ContactShadows
+              position={[0, -0.49, 0]}
+              opacity={0.9}
+              width={2}
+              height={2}
+              blur={2.5}
+              far={5}
+              resolution={1024}
+              color="#000000"
+            />
           )}
 
           <Suspense fallback={null}>
@@ -198,7 +211,7 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
           <Suspense
             fallback={
               <Html center>
-                <p className="text-black">Loading model...</p>
+                <p className="text-white">Loading model...</p>
               </Html>
             }
           >
@@ -216,28 +229,28 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
           <OrbitControls enableZoom enablePan enableRotate />
         </Canvas>
 
-        {/* Control Icons - always black with transparent bg */}
-        <div className="absolute bottom-4 right-4 flex flex-col gap-3 p-2 z-10 text-black">
+        {/* Dark-Themed Icon Controls */}
+        <div className="absolute bottom-4 right-4 flex flex-col gap-3 bg-black bg-opacity-10 rounded-lg p-2 shadow-md z-10 text-black">
           <button
             onClick={() => setBgWhite(!bgWhite)}
             title="Toggle Background"
-            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+            className="hover:scale-110 transition"
           >
-            {bgWhite ? <Moon size={20} /> : <Sun size={20} />}
+            {bgWhite ? <Sun size={20} /> : <Sun size={20} />}
           </button>
 
           <button
             onClick={() => setShowShadow(!showShadow)}
             title="Toggle Shadow"
-            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+            className="hover:scale-110 transition"
           >
             <Square size={20} />
           </button>
 
           <button
             onClick={() => setShowModel(!showModel)}
-            title="Toggle Model"
-            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+            title="Toggle Model Visibility"
+            className="hover:scale-110 transition"
           >
             {showModel ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
@@ -245,27 +258,30 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
           <button
             onClick={() => setShowDimensions(!showDimensions)}
             title="Toggle Dimensions"
-            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+            className="hover:scale-110 transition"
           >
             <Info size={20} />
           </button>
         </div>
       </div>
 
-      {/* Variant Selectors */}
+      {/* Color Variant Buttons */}
       <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 mt-6 sm:mt-8 w-full max-w-[600px]">
         {colorVariants.map((img, idx) => (
           <button
             key={img}
             onClick={() => onColorSelect(idx)}
-            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-4 ${
-              selectedColor === idx ? "border-[#F4C16B]" : "border-transparent"
+            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-4 p-0 m-0 ${
+              selectedColor === idx
+                ? "border-[#F4C16B]"
+                : "border-transparent"
             }`}
+            type="button"
           >
             <img
               src={img}
               alt={`Variant ${idx + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover block"
               draggable={false}
             />
           </button>
@@ -275,7 +291,7 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
   );
 }
 
-// Preload models
+// Preload GLTF models
 useGLTF.preload("/models/ChestofDrawers/001.1.glb");
 useGLTF.preload("/models/ChestofDrawers/001.2.glb");
 useGLTF.preload("/models/ChestofDrawers/001.3.glb");
