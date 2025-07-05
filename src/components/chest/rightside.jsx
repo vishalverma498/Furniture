@@ -1,58 +1,195 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Html, Environment } from "@react-three/drei";
+import {
+  OrbitControls,
+  useGLTF,
+  Html,
+  Environment,
+  Line,
+} from "@react-three/drei";
 import { EXRLoader } from "three-stdlib";
 import * as THREE from "three";
+import {
+  Sun,
+  Moon,
+  Square,
+  Eye,
+  EyeOff,
+  Info,
+} from "lucide-react";
 
-// Load .exr skydome lighting (skylight only, no background)
+// Load .exr lighting
 function EXREnvironment({ path }) {
   const texture = useLoader(EXRLoader, path);
   texture.mapping = THREE.EquirectangularReflectionMapping;
   return <Environment background={false} map={texture} />;
 }
 
-// Model component
-function Model({ url, scale = 1.5 }) {
+// Dimension box with labels
+function DimensionBox({ box }) {
+  if (!box) return null;
+
+  const min = box.min;
+  const max = box.max;
+
+  const corners = [
+    new THREE.Vector3(min.x, min.y, min.z),
+    new THREE.Vector3(max.x, min.y, min.z),
+    new THREE.Vector3(max.x, max.y, min.z),
+    new THREE.Vector3(min.x, max.y, min.z),
+    new THREE.Vector3(min.x, min.y, max.z),
+    new THREE.Vector3(max.x, min.y, max.z),
+    new THREE.Vector3(max.x, max.y, max.z),
+    new THREE.Vector3(min.x, max.y, max.z),
+  ];
+
+  const edges = [
+    [0, 1], [1, 2], [2, 3], [3, 0],
+    [4, 5], [5, 6], [6, 7], [7, 4],
+    [0, 4], [1, 5], [2, 6], [3, 7],
+  ];
+
+  const width = (max.x - min.x).toFixed(2);
+  const height = (max.y - min.y).toFixed(2);
+  const depth = (max.z - min.z).toFixed(2);
+
+  return (
+    <>
+      {edges.map(([start, end], i) => (
+        <Line
+          key={i}
+          points={[corners[start], corners[end]]}
+          color="black"
+          lineWidth={1}
+          dashed
+          dashSize={0.1}
+          gapSize={0.1}
+        />
+      ))}
+
+      <Html
+        position={[(min.x + max.x) / 2, min.y, min.z - 0.05]}
+        style={labelStyle}
+        center
+      >
+        Width: {width} m
+      </Html>
+
+      <Html
+        position={[min.x - 0.05, (min.y + max.y) / 2, min.z]}
+        style={labelStyle}
+        center
+      >
+        Height: {height} m
+      </Html>
+
+      <Html
+        position={[max.x + 0.05, min.y, (min.z + max.z) / 2]}
+        style={labelStyle}
+        center
+      >
+        Depth: {depth} m
+      </Html>
+    </>
+  );
+}
+
+const labelStyle = {
+  color: "black",
+  backgroundColor: "rgba(255,255,255,0.8)",
+  padding: "2px 6px",
+  borderRadius: "4px",
+  fontSize: "12px",
+  whiteSpace: "nowrap",
+  pointerEvents: "none",
+  userSelect: "none",
+};
+
+// 3D model
+function Model({ url, scale = 1.5, visible = true, onLoad }) {
   const gltf = useGLTF(url);
 
   useEffect(() => {
-    if (gltf && gltf.scene) {
-      console.log(`✅ Model loaded successfully: ${url}`);
-    } else {
-      console.warn(`⚠️ Model not loaded or missing scene: ${url}`);
-    }
-  }, [gltf, url]);
+    if (gltf?.scene) {
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
 
-  if (!gltf || !gltf.scene) {
-    return null;
-  }
+      if (onLoad) {
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        onLoad(box);
+      }
+    }
+  }, [gltf, onLoad]);
+
+  if (!gltf?.scene || !visible) return null;
 
   return (
     <primitive
       object={gltf.scene}
       scale={scale}
       position={[0, -0.5, 0]}
-      rotation={[0, -Math.PI / 2, 0]} // Rotate model
+      rotation={[0, -Math.PI / 2, 0]}
     />
   );
 }
 
 export default function DrawerPreview({ colorVariants, selectedColor, onColorSelect }) {
   const modelUrl = `/models/ChestofDrawers/001.${selectedColor + 1}.glb`;
-  const exrPath = "/exr/brown_photostudio_01_2k.exr"; // Your EXR file path
+  const exrPath = "/exr/brown_photostudio_01_2k.exr";
 
-  useEffect(() => {
-    console.log("🧩 Loading GLB model URL:", modelUrl);
-  }, [modelUrl]);
+  const [bgWhite, setBgWhite] = useState(true);
+  const [showShadow, setShowShadow] = useState(true);
+  const [showModel, setShowModel] = useState(true);
+  const [box, setBox] = useState(null);
+  const [showDimensions, setShowDimensions] = useState(false);
+
+  const shadowPlaneColor = bgWhite ? "#f0f0f0" : "#0a0a0a";
 
   return (
     <div className="flex-1 flex flex-col items-center">
-      {/* 3D Model Viewer */}
-      <div className="w-full max-w-[600px] h-[350px] sm:h-[450px] bg-white rounded-lg overflow-hidden shadow-xl">
-        <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
-          {/* Adjust light intensities as needed */}
+      <div
+        className={`relative w-full max-w-[600px] h-[350px] sm:h-[450px] ${
+          bgWhite ? "bg-white" : "bg-black"
+        } rounded-lg overflow-hidden shadow-xl`}
+      >
+        <Canvas
+          shadows
+          camera={{ position: [0, 0, 3], fov: 45 }}
+          gl={{ preserveDrawingBuffer: true }}
+        >
           <ambientLight intensity={0.5} />
-          <directionalLight position={[5, 5, 5]} intensity={0.5} />
+          <directionalLight
+            position={[5, 5, 5]}
+            intensity={showShadow ? 0.7 : 0}
+            castShadow={showShadow}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-near={0.5}
+            shadow-camera-far={20}
+            shadow-camera-left={-5}
+            shadow-camera-right={5}
+            shadow-camera-top={5}
+            shadow-camera-bottom={-5}
+          />
+
+          {showShadow && (
+            <mesh
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[0, -0.5, 0]}
+              receiveShadow
+            >
+              <planeGeometry args={[100, 100]} />
+              <meshStandardMaterial
+                color={shadowPlaneColor}
+                opacity={0.9}
+                transparent
+              />
+            </mesh>
+          )}
 
           <Suspense fallback={null}>
             <EXREnvironment path={exrPath} />
@@ -61,32 +198,74 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
           <Suspense
             fallback={
               <Html center>
-                <p className="text-white">Loading model...</p>
+                <p className="text-black">Loading model...</p>
               </Html>
             }
           >
-            <Model key={modelUrl} url={modelUrl} scale={1.5} />
+            <Model
+              key={modelUrl}
+              url={modelUrl}
+              scale={1.5}
+              visible={showModel}
+              onLoad={setBox}
+            />
           </Suspense>
+
+          {showDimensions && <DimensionBox box={box} />}
 
           <OrbitControls enableZoom enablePan enableRotate />
         </Canvas>
+
+        {/* Control Icons - always black with transparent bg */}
+        <div className="absolute bottom-4 right-4 flex flex-col gap-3 p-2 z-10 text-black">
+          <button
+            onClick={() => setBgWhite(!bgWhite)}
+            title="Toggle Background"
+            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+          >
+            {bgWhite ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+
+          <button
+            onClick={() => setShowShadow(!showShadow)}
+            title="Toggle Shadow"
+            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+          >
+            <Square size={20} />
+          </button>
+
+          <button
+            onClick={() => setShowModel(!showModel)}
+            title="Toggle Model"
+            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+          >
+            {showModel ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+
+          <button
+            onClick={() => setShowDimensions(!showDimensions)}
+            title="Toggle Dimensions"
+            className="p-2 rounded-full hover:bg-black/10 transition text-black"
+          >
+            <Info size={20} />
+          </button>
+        </div>
       </div>
 
-      {/* Color Variant Buttons */}
+      {/* Variant Selectors */}
       <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 mt-6 sm:mt-8 w-full max-w-[600px]">
         {colorVariants.map((img, idx) => (
           <button
             key={img}
             onClick={() => onColorSelect(idx)}
-            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-4 p-0 m-0 ${
+            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-4 ${
               selectedColor === idx ? "border-[#F4C16B]" : "border-transparent"
             }`}
-            type="button"
           >
             <img
               src={img}
               alt={`Variant ${idx + 1}`}
-              className="w-full h-full object-cover block"
+              className="w-full h-full object-cover"
               draggable={false}
             />
           </button>
@@ -96,7 +275,7 @@ export default function DrawerPreview({ colorVariants, selectedColor, onColorSel
   );
 }
 
-// Preload all models
+// Preload models
 useGLTF.preload("/models/ChestofDrawers/001.1.glb");
 useGLTF.preload("/models/ChestofDrawers/001.2.glb");
 useGLTF.preload("/models/ChestofDrawers/001.3.glb");
